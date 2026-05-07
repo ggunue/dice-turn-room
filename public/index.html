@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dice Turn Room</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="stage">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Shared dice room</p>
+            <h1>Dice Turn Room</h1>
+          </div>
+          <div class="room-status" aria-live="polite">
+            <span id="roomCodeBadge">방 없음</span>
+            <span id="joinStatusBadge">입장 전</span>
+            <span id="turnStatusBadge">턴 대기</span>
+            <button id="copyLink" class="icon-button" title="초대 링크 복사" type="button">↗</button>
+          </div>
+          <div id="topPlayers" class="top-players" aria-label="현재 입장한 사람"></div>
+        </header>
+
+        <div class="turn-banner" id="turnBanner">
+          <span class="pulse"></span>
+          <div>
+            <p>현재 턴</p>
+            <strong id="activePlayer">대기 중</strong>
+          </div>
+        </div>
+
+        <div class="dice-stage" id="diceStage" aria-live="polite"></div>
+
+        <div class="roll-summary" id="rollSummary">
+          <span>아직 굴린 결과가 없습니다.</span>
+        </div>
+
+        <div class="controls">
+          <button id="rollButton" class="primary" type="button">내 턴 굴리기</button>
+          <button id="nextButton" type="button">턴 넘기기</button>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <form id="joinForm" class="join">
+          <label>
+            이름
+            <input id="nameInput" name="name" maxlength="24" placeholder="플레이어 이름" />
+          </label>
+          <label>
+            방 코드
+            <input
+              id="roomInput"
+              name="room"
+              maxlength="6"
+              pattern="[A-Za-z0-9]{6}"
+              placeholder="6자리 영어+숫자 코드"
+            />
+          </label>
+          <button type="submit">입장</button>
+        </form>
+
+        <section class="settings">
+          <div class="setting-row">
+            <label for="diceCount">주사위 개수</label>
+            <output id="diceCountValue">2</output>
+          </div>
+          <input id="diceCount" type="range" min="1" max="12" value="2" />
+
+          <div class="setting-row">
+            <label for="diceSides">주사위 면수</label>
+            <select id="diceSides">
+              <option value="4">d4</option>
+              <option value="6" selected>d6</option>
+              <option value="8">d8</option>
+              <option value="10">d10</option>
+              <option value="12">d12</option>
+              <option value="20">d20</option>
+              <option value="100">d100</option>
+            </select>
+          </div>
+        </section>
+
+        <section>
+          <h2>플레이어</h2>
+          <ol id="players" class="players"></ol>
+        </section>
+
+        <section>
+          <h2>기록</h2>
+          <ul id="log" class="log"></ul>
+        </section>
+      </aside>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
