@@ -125,6 +125,7 @@ function renderDice(room) {
 
 function renderPlayers(room) {
   players.innerHTML = "";
+  const canReorder = room.hostId === state.playerId && room.players.length > 1 && !room.rolling;
 
   room.players.forEach((player, index) => {
     const item = document.createElement("li");
@@ -133,9 +134,38 @@ function renderPlayers(room) {
       player.id === state.playerId ? "나" : "",
       player.id === room.hostId ? "방장" : ""
     ].filter(Boolean);
-    item.innerHTML = `<span class="order">${index + 1}</span><span>${player.name}${tags.length ? ` · ${tags.join(" · ")}` : ""}</span>`;
+    item.innerHTML = `
+      <span class="order">${index + 1}</span>
+      <span>${player.name}${tags.length ? ` · ${tags.join(" · ")}` : ""}</span>
+      <span class="order-actions">
+        <button type="button" data-move="up" data-player-id="${player.id}" title="순서 올리기" ${!canReorder || index === 0 ? "disabled" : ""}>↑</button>
+        <button type="button" data-move="down" data-player-id="${player.id}" title="순서 내리기" ${!canReorder || index === room.players.length - 1 ? "disabled" : ""}>↓</button>
+      </span>
+    `;
     players.append(item);
   });
+}
+
+async function movePlayer(playerId, direction) {
+  if (!state.room) return;
+
+  const orderedPlayerIds = state.room.players.map((player) => player.id);
+  const index = orderedPlayerIds.indexOf(playerId);
+  if (index === -1) return;
+
+  const targetIndex = direction === "up" ? index - 1 : index + 1;
+  if (targetIndex < 0 || targetIndex >= orderedPlayerIds.length) return;
+
+  [orderedPlayerIds[index], orderedPlayerIds[targetIndex]] = [orderedPlayerIds[targetIndex], orderedPlayerIds[index]];
+
+  try {
+    await api(`/api/rooms/${state.roomId}/order`, {
+      method: "POST",
+      body: JSON.stringify({ playerId: state.playerId, orderedPlayerIds })
+    });
+  } catch (error) {
+    alert(error.message);
+  }
 }
 
 function renderTopPlayers(room) {
@@ -310,6 +340,12 @@ nextButton.addEventListener("click", async () => {
   } catch (error) {
     alert(error.message);
   }
+});
+
+players.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-move]");
+  if (!button) return;
+  movePlayer(button.dataset.playerId, button.dataset.move);
 });
 
 copyLink.addEventListener("click", async () => {

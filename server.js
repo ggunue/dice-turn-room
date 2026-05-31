@@ -106,6 +106,25 @@ function nextTurn(room) {
   room.activeIndex = (room.activeIndex + 1) % room.players.length;
 }
 
+function reorderPlayers(room, orderedPlayerIds) {
+  if (!Array.isArray(orderedPlayerIds) || orderedPlayerIds.length !== room.players.length) {
+    return false;
+  }
+
+  const currentIds = new Set(room.players.map((player) => player.id));
+  const requestedIds = new Set(orderedPlayerIds);
+  if (currentIds.size !== requestedIds.size) return false;
+  for (const id of currentIds) {
+    if (!requestedIds.has(id)) return false;
+  }
+
+  const activePlayerId = room.players[room.activeIndex]?.id || null;
+  const byId = new Map(room.players.map((player) => [player.id, player]));
+  room.players = orderedPlayerIds.map((id) => byId.get(id));
+  room.activeIndex = Math.max(0, room.players.findIndex((player) => player.id === activePlayerId));
+  return true;
+}
+
 async function serveStatic(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
@@ -193,6 +212,20 @@ const server = http.createServer(async (req, res) => {
       }
       room.diceCount = Math.max(1, Math.min(12, Number(body.diceCount) || room.diceCount));
       room.diceSides = Math.max(2, Math.min(100, Number(body.diceSides) || room.diceSides));
+      broadcast(room);
+      return sendJson(res, 200, publicRoom(room));
+    }
+
+    if (req.method === "POST" && url.pathname.endsWith("/order")) {
+      const room = getRoom(url.pathname.split("/").at(-2));
+      if (!room) return sendJson(res, 400, { error: "Room code must be 6 letters or numbers." });
+      const body = await bodyJson(req);
+      if (room.hostId && body.playerId !== room.hostId) {
+        return sendJson(res, 403, { error: "Only the room host can change player order." });
+      }
+      if (!reorderPlayers(room, body.orderedPlayerIds)) {
+        return sendJson(res, 400, { error: "Invalid player order." });
+      }
       broadcast(room);
       return sendJson(res, 200, publicRoom(room));
     }

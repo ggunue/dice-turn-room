@@ -450,7 +450,7 @@ input[type="range"] {
 
 .players li {
   display: grid;
-  grid-template-columns: 28px 1fr;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   font-size: 14px;
@@ -475,6 +475,29 @@ input[type="range"] {
 .players .active .order {
   background: var(--ink);
   color: var(--canvas);
+}
+
+.order-actions {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.order-actions button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  min-height: 28px;
+  border: 1px solid var(--hairline);
+  border-radius: 9999px;
+  background: var(--canvas);
+  color: var(--ink);
+  padding: 0;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.order-actions button:disabled {
+  opacity: 0.24;
 }
 
 .log li {
