@@ -17,6 +17,9 @@ const diceSides = $("#diceSides");
 const rollButton = $("#rollButton");
 const nextButton = $("#nextButton");
 const copyLink = $("#copyLink");
+const qrButton = $("#qrButton");
+const qrOverlay = $("#qrOverlay");
+const qrCloseButton = $("#qrCloseButton");
 const roomCodeBadge = $("#roomCodeBadge");
 const joinStatusBadge = $("#joinStatusBadge");
 const turnStatusBadge = $("#turnStatusBadge");
@@ -355,6 +358,22 @@ copyLink.addEventListener("click", async () => {
   setTimeout(() => {
     copyLink.textContent = "↗";
   }, 1200);
+});
+
+qrButton.addEventListener("click", () => {
+  qrOverlay.classList.add("is-open");
+});
+
+qrCloseButton.addEventListener("click", () => {
+  qrOverlay.classList.remove("is-open");
+});
+
+qrOverlay.addEventListener("click", (event) => {
+  if (event.target === qrOverlay) qrOverlay.classList.remove("is-open");
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") qrOverlay.classList.remove("is-open");
 });
 
 render();

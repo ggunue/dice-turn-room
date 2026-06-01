@@ -128,7 +128,8 @@ button:disabled {
 }
 
 .room-status span,
-.icon-button {
+.icon-button,
+.status-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -179,6 +180,52 @@ h2 {
 .icon-button {
   width: 36px;
   padding: 0;
+}
+
+.status-button {
+  border: 0;
+  font-weight: 700;
+}
+
+.qr-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.qr-overlay.is-open {
+  display: grid;
+}
+
+.qr-card {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 24px;
+  background: var(--canvas);
+  padding: 22px;
+}
+
+.qr-card p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.qr-card img {
+  display: block;
+  width: min(280px, 70vw);
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.qr-card button {
+  min-height: 38px;
 }
 
 .turn-banner {
